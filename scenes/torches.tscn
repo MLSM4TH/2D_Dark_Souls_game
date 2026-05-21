@@ -1,0 +1,102 @@
+[gd_scene load_steps=16 format=3 uid="uid://2n5bmvdnrfhe"]
+
+[ext_resource type="Script" uid="uid://dg0vjkej14gnu" path="res://scripts/world/torches.gd" id="1_dqvl5"]
+[ext_resource type="Texture2D" uid="uid://ci0yj0w4om240" path="res://assets/world generation/torches/torch_animation.png" id="2_1gkq2"]
+[ext_resource type="AudioStream" uid="uid://by757s87lwvcs" path="res://assets/sounds/torch.wav" id="3_4ambb"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4ambb"]
+atlas = ExtResource("2_1gkq2")
+region = Rect2(0, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_suecu"]
+atlas = ExtResource("2_1gkq2")
+region = Rect2(48, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jvg74"]
+atlas = ExtResource("2_1gkq2")
+region = Rect2(96, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xkgek"]
+atlas = ExtResource("2_1gkq2")
+region = Rect2(144, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2o2nk"]
+atlas = ExtResource("2_1gkq2")
+region = Rect2(192, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wpdeq"]
+atlas = ExtResource("2_1gkq2")
+region = Rect2(240, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_avg1f"]
+atlas = ExtResource("2_1gkq2")
+region = Rect2(288, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2m4l5"]
+atlas = ExtResource("2_1gkq2")
+region = Rect2(336, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_01s1f"]
+atlas = ExtResource("2_1gkq2")
+region = Rect2(384, 0, 48, 48)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_1o27k"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4ambb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_suecu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jvg74")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xkgek")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2o2nk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wpdeq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_avg1f")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2m4l5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_01s1f")
+}],
+"loop": true,
+"name": &"torch_animation",
+"speed": 5.0
+}]
+
+[sub_resource type="Gradient" id="Gradient_1gkq2"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_4ambb"]
+gradient = SubResource("Gradient_1gkq2")
+width = 256
+height = 256
+fill = 1
+
+[node name="torches" type="Node2D"]
+script = ExtResource("1_dqvl5")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+z_index = 5
+sprite_frames = SubResource("SpriteFrames_1o27k")
+animation = &"torch_animation"
+frame_progress = 0.9694282
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+color = Color(1, 0.7019608, 0.2784314, 1)
+energy = 0.7
+texture = SubResource("GradientTexture2D_4ambb")
+texture_scale = 3.0
+
+[node name="torch" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("3_4ambb")
