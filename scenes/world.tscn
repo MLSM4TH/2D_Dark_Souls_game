@@ -1,4 +1,4 @@
-[gd_scene load_steps=156 format=3 uid="uid://cdgpybdh8cgyv"]
+[gd_scene load_steps=157 format=3 uid="uid://cdgpybdh8cgyv"]
 
 [ext_resource type="Script" uid="uid://cgvrw0mvb7rb0" path="res://scripts/world/world.gd" id="1_o8fc1"]
 [ext_resource type="Script" uid="uid://8o5hakgu8fa5" path="res://scripts/player/player.gd" id="1_w7kh3"]
@@ -24,9 +24,10 @@
 [ext_resource type="AudioStream" uid="uid://t68v7bace5er" path="res://assets/sounds/sword_parry.wav" id="18_xgqkh"]
 [ext_resource type="Texture2D" uid="uid://y3pdborrv1uw" path="res://assets/HUD/health bar/health_bar.png" id="19_pm21f"]
 [ext_resource type="AudioStream" uid="uid://cqi7p711350st" path="res://assets/sounds/water_drip_cave.wav" id="22_ctatt"]
+[ext_resource type="PackedScene" uid="uid://5iet6qhal5qx" path="res://scenes/skeleton_enemy.tscn" id="25_xgqkh"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_fj7yv"]
-size = Vector2(24, 70)
+size = Vector2(28.75, 21.25)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_dss4m"]
 atlas = ExtResource("2_jhx03")
@@ -1001,12 +1002,14 @@ animations = [{
 [node name="world" type="Node2D"]
 script = ExtResource("1_o8fc1")
 
-[node name="player" type="CharacterBody2D" parent="."]
+[node name="player" type="CharacterBody2D" parent="." groups=["player"]]
 z_index = 10
+collision_layer = 2
+collision_mask = 5
 script = ExtResource("1_w7kh3")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="player"]
-position = Vector2(0.5, 0)
+position = Vector2(-0.375, 20.375)
 shape = SubResource("RectangleShape2D_fj7yv")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="player"]
@@ -1055,3 +1058,6 @@ animation = &"health_bar_depletion_animation"
 
 [node name="water_drip_cave" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("22_ctatt")
+
+[node name="SkeletonEnemy" parent="." instance=ExtResource("25_xgqkh")]
+scale = Vector2(2, 2)

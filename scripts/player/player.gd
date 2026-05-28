@@ -31,7 +31,6 @@ var is_parrying = false
 var can_cancel_attack = false
 
 @onready var anim = $AnimatedSprite2D
-
 @onready var stamina_bar = $"../CanvasLayer/StaminaBar"
 @onready var health_bar = $"../CanvasLayer/HealthBar"
 
@@ -42,6 +41,8 @@ var can_cancel_attack = false
 
 
 func _ready():
+	add_to_group("player")
+
 	anim.play("idle_south")
 
 	stamina_bar.play("stamina_bar_depletion_animation")
@@ -64,13 +65,10 @@ func _physics_process(delta):
 
 	if Input.is_action_pressed("move_right"):
 		direction.x += 1
-
 	if Input.is_action_pressed("move_left"):
 		direction.x -= 1
-
 	if Input.is_action_pressed("move_down"):
 		direction.y += 1
-
 	if Input.is_action_pressed("move_up"):
 		direction.y -= 1
 
@@ -132,6 +130,38 @@ func _physics_process(delta):
 
 	handle_animation(direction, is_sprinting)
 	handle_footsteps(direction, is_sprinting)
+
+
+func take_damage(amount):
+	if is_invincible:
+		return
+
+	health -= amount
+	health = clamp(health, 0, max_health)
+	update_health_bar()
+
+	if health <= 0:
+		die()
+
+
+func die():
+	print("Player died")
+	velocity = Vector2.ZERO
+	set_physics_process(false)
+
+
+func update_health_bar():
+	var health_percent = health / max_health
+	var frame_count = health_bar.sprite_frames.get_frame_count("health_bar_depletion_animation")
+	var frame_index = round((1.0 - health_percent) * (frame_count - 1))
+	health_bar.frame = clamp(frame_index, 0, frame_count - 1)
+
+
+func update_stamina_bar():
+	var stamina_percent = stamina / max_stamina
+	var frame_count = stamina_bar.sprite_frames.get_frame_count("stamina_bar_depletion_animation")
+	var frame_index = round((1.0 - stamina_percent) * (frame_count - 1))
+	stamina_bar.frame = clamp(frame_index, 0, frame_count - 1)
 
 
 func handle_footsteps(direction, is_sprinting):
@@ -227,7 +257,6 @@ func attack():
 
 	if is_attacking:
 		attack_damage_active = true
-		print("Damage is now active")
 
 	await anim.animation_finished
 
@@ -242,7 +271,6 @@ func cancel_attack():
 	is_attacking = false
 	can_cancel_attack = false
 	attack_damage_active = false
-
 	play_idle_animation()
 
 
@@ -275,7 +303,6 @@ func start_parry():
 func stop_parry():
 	is_parrying = false
 	is_invincible = false
-
 	anim.play()
 	play_idle_animation()
 
@@ -284,11 +311,7 @@ func handle_animation(direction, is_sprinting):
 	if direction != Vector2.ZERO:
 		if abs(direction.x) > abs(direction.y):
 			last_direction = "sideways"
-
-			if direction.x > 0:
-				anim.flip_h = false
-			else:
-				anim.flip_h = true
+			anim.flip_h = direction.x < 0
 
 			if is_sprinting:
 				anim.play("running_sideways")
@@ -314,7 +337,6 @@ func handle_animation(direction, is_sprinting):
 				anim.play("walk_north")
 
 		anim.speed_scale = 1.0
-
 	else:
 		play_idle_animation()
 
@@ -328,26 +350,3 @@ func play_idle_animation():
 		anim.play("idle_south")
 	elif last_direction == "north":
 		anim.play("idle_north")
-
-
-func update_stamina_bar():
-	var stamina_percent = stamina / max_stamina
-	var frame_count = stamina_bar.sprite_frames.get_frame_count("stamina_bar_depletion_animation")
-	var frame_index = round((1.0 - stamina_percent) * (frame_count - 1))
-	stamina_bar.frame = clamp(frame_index, 0, frame_count - 1)
-
-
-func update_health_bar():
-	var health_percent = health / max_health
-	var frame_count = health_bar.sprite_frames.get_frame_count("health_bar_depletion_animation")
-	var frame_index = round((1.0 - health_percent) * (frame_count - 1))
-	health_bar.frame = clamp(frame_index, 0, frame_count - 1)
-
-
-func take_damage(amount):
-	if is_invincible:
-		return
-
-	health -= amount
-	health = clamp(health, 0, max_health)
-	update_health_bar()

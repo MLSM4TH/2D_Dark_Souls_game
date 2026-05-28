@@ -3,6 +3,7 @@ extends Node2D
 @onready var tilemap = $TileMapLayer
 @onready var torches = $Torches
 @onready var player = $player
+@onready var skeleton_enemy = $SkeletonEnemy
 
 var WALL_NORMAL_SOURCE = 0
 var WALL_DECAYED_SOURCE = 1
@@ -32,6 +33,7 @@ func _ready():
 	spawn_player_on_floor(Vector2i(10, 10))
 	ambient_drips.volume_db = -18
 	ambient_drips.play()
+	place_skeleton_on_floor(Vector2i(12, 10))
 
 
 func generate_dungeon():
@@ -268,3 +270,8 @@ func clear_old_torches():
 
 func spawn_player_on_floor(pos):
 	player.global_position = tilemap.to_global(tilemap.map_to_local(pos))
+
+
+func place_skeleton_on_floor(pos: Vector2i):
+	skeleton_enemy.global_position = tilemap.to_global(tilemap.map_to_local(pos))
+	skeleton_enemy.global_position.y -= 6
