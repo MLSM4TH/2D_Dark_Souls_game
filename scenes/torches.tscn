@@ -84,6 +84,7 @@ height = 256
 fill = 1
 
 [node name="torches" type="Node2D"]
+process_mode = 1
 script = ExtResource("1_dqvl5")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]

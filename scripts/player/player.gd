@@ -30,6 +30,9 @@ var is_invincible = false
 var is_parrying = false
 var can_cancel_attack = false
 
+var player_attack_damage = 10.0
+var player_attack_range = 25.0
+
 @onready var anim = $AnimatedSprite2D
 @onready var stamina_bar = $"../CanvasLayer/StaminaBar"
 @onready var health_bar = $"../CanvasLayer/HealthBar"
@@ -243,22 +246,23 @@ func attack():
 
 	anim.play(attack_animation)
 
-	while anim.frame < attack_cancel_frame and is_attacking:
+	while anim.frame < 2 and is_attacking:
 		await get_tree().process_frame
-
-	can_cancel_attack = true
-
-	var frame_count = anim.sprite_frames.get_frame_count(attack_animation)
-	var animation_fps = anim.sprite_frames.get_animation_speed(attack_animation)
-	var animation_length = frame_count / animation_fps
-	var damage_time = animation_length * attack_commit_time
-
-	await get_tree().create_timer(damage_time).timeout
 
 	if is_attacking:
 		attack_damage_active = true
+		damage_enemy_in_range()
 
-	await anim.animation_finished
+	can_cancel_attack = true
+
+	while anim.is_playing() and is_attacking:
+		if velocity.length() > 0 and can_cancel_attack:
+			anim.stop()
+			is_attacking = false
+			attack_damage_active = false
+			return
+
+		await get_tree().process_frame
 
 	is_attacking = false
 	can_cancel_attack = false
@@ -350,3 +354,37 @@ func play_idle_animation():
 		anim.play("idle_south")
 	elif last_direction == "north":
 		anim.play("idle_north")
+		
+func damage_enemy_in_range():
+	var enemies = get_tree().get_nodes_in_group("enemy")
+
+	for enemy in enemies:
+		var to_enemy = enemy.global_position - global_position
+
+		# SOUTH ATTACK
+		if last_direction == "south":
+			if to_enemy.y > -20 and to_enemy.y < 90 and abs(to_enemy.x) < 55:
+				hit_enemy(enemy)
+
+		# NORTH ATTACK
+		elif last_direction == "north":
+			if to_enemy.y < 35 and to_enemy.y > -130 and abs(to_enemy.x) < 70:
+				hit_enemy(enemy)
+
+		# SIDEWAYS ATTACK
+		elif last_direction == "sideways":
+
+			# RIGHT
+			if anim.flip_h == false:
+				if to_enemy.x > -10 and to_enemy.x < 110 and abs(to_enemy.y) < 50:
+					hit_enemy(enemy)
+
+			# LEFT
+			else:
+				if to_enemy.x < 10 and to_enemy.x > -110 and abs(to_enemy.y) < 50:
+					hit_enemy(enemy)
+					
+func hit_enemy(enemy):
+	if enemy.has_method("take_damage"):
+		print("Enemy hit")
+		enemy.take_damage(player_attack_damage)

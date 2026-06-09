@@ -3,7 +3,25 @@ extends Node2D
 @onready var tilemap = $TileMapLayer
 @onready var torches = $Torches
 @onready var player = $player
+@onready var score_label = $CanvasLayer/ScoreLabel
 @onready var skeleton_enemy = $SkeletonEnemy
+
+@onready var pause_menu = $CanvasLayer/PauseMenu
+@onready var main_pause_page = $CanvasLayer/PauseMenu/MainPausePage
+@onready var settings_page = $CanvasLayer/PauseMenu/SettingsPage
+
+@onready var resume_button = $CanvasLayer/PauseMenu/MainPausePage/VBoxContainer/ResumeButton
+@onready var settings_button = $CanvasLayer/PauseMenu/MainPausePage/VBoxContainer/SettingsButton
+@onready var main_menu_button = $CanvasLayer/PauseMenu/MainPausePage/VBoxContainer/MainMenuButton
+@onready var quit_button = $CanvasLayer/PauseMenu/MainPausePage/VBoxContainer/QuitButton
+
+@onready var fullscreen_button = $CanvasLayer/PauseMenu/SettingsPage/VBoxContainer/FullscreenButton
+@onready var borderless_button = $CanvasLayer/PauseMenu/SettingsPage/VBoxContainer/BorderlessButton
+@onready var back_button = $CanvasLayer/PauseMenu/SettingsPage/VBoxContainer/BackButton
+
+var is_paused = false
+
+var score = 0
 
 var WALL_NORMAL_SOURCE = 0
 var WALL_DECAYED_SOURCE = 1
@@ -34,6 +52,21 @@ func _ready():
 	ambient_drips.volume_db = -18
 	ambient_drips.play()
 	place_skeleton_on_floor(Vector2i(12, 10))
+	
+	pause_menu.visible = false
+	main_pause_page.visible = true
+	settings_page.visible = false
+
+	resume_button.pressed.connect(_on_resume_button_pressed)
+	settings_button.pressed.connect(_on_settings_button_pressed)
+	main_menu_button.pressed.connect(_on_main_menu_button_pressed)
+	quit_button.pressed.connect(_on_quit_button_pressed)
+
+	fullscreen_button.pressed.connect(_on_fullscreen_button_pressed)
+	borderless_button.pressed.connect(_on_borderless_button_pressed)
+	back_button.pressed.connect(_on_back_button_pressed)
+	
+	score_label.text = "Score: 0"
 
 
 func generate_dungeon():
@@ -275,3 +308,66 @@ func spawn_player_on_floor(pos):
 func place_skeleton_on_floor(pos: Vector2i):
 	skeleton_enemy.global_position = tilemap.to_global(tilemap.map_to_local(pos))
 	skeleton_enemy.global_position.y -= 6
+	
+func add_score(amount):
+	score += amount
+	score_label.text = "Score: " + str(score)
+	
+func _input(event):
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
+		if is_paused and settings_page.visible:
+			show_main_pause_page()
+		else:
+			toggle_pause()
+
+
+func toggle_pause():
+	is_paused = !is_paused
+	get_tree().paused = is_paused
+	pause_menu.visible = is_paused
+
+	if is_paused:
+		show_main_pause_page()
+
+
+func show_main_pause_page():
+	main_pause_page.visible = true
+	settings_page.visible = false
+
+
+func show_settings_page():
+	main_pause_page.visible = false
+	settings_page.visible = true
+
+func _on_resume_button_pressed():
+	toggle_pause()
+
+
+func _on_settings_button_pressed():
+	show_settings_page()
+
+
+func _on_back_button_pressed():
+	show_main_pause_page()
+
+
+func _on_fullscreen_button_pressed():
+	var mode = DisplayServer.window_get_mode()
+
+	if mode == DisplayServer.WINDOW_MODE_FULLSCREEN:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	else:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+
+
+func _on_borderless_button_pressed():
+	var borderless = DisplayServer.window_get_flag(DisplayServer.WINDOW_FLAG_BORDERLESS)
+	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, !borderless)
+	
+
+func _on_main_menu_button_pressed():
+	print("Main menu not added yet")
+
+
+func _on_quit_button_pressed():
+	get_tree().quit()

@@ -1081,15 +1081,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="MainPausePage" type="Panel" parent="CanvasLayer/PauseMenu"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/PauseMenu/MainPausePage"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/PauseMenu"]
 process_mode = 3
 layout_mode = 1
 anchors_preset = 15
@@ -1101,66 +1093,38 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 12
 
-[node name="ResumeButton" type="Button" parent="CanvasLayer/PauseMenu/MainPausePage/VBoxContainer"]
+[node name="ResumeButton" type="Button" parent="CanvasLayer/PauseMenu/VBoxContainer"]
 process_mode = 3
 custom_minimum_size = Vector2(220, 45)
 layout_mode = 2
 text = "Resume"
 
-[node name="MainMenuButton" type="Button" parent="CanvasLayer/PauseMenu/MainPausePage/VBoxContainer"]
-process_mode = 3
-custom_minimum_size = Vector2(220, 45)
-layout_mode = 2
-text = "Main Menu"
-
-[node name="SettingsButton" type="Button" parent="CanvasLayer/PauseMenu/MainPausePage/VBoxContainer"]
+[node name="SettingsButton" type="Button" parent="CanvasLayer/PauseMenu/VBoxContainer"]
 process_mode = 3
 custom_minimum_size = Vector2(220, 45)
 layout_mode = 2
 text = "Settings"
 
-[node name="QuitButton" type="Button" parent="CanvasLayer/PauseMenu/MainPausePage/VBoxContainer"]
+[node name="MainMenuButton" type="Button" parent="CanvasLayer/PauseMenu/VBoxContainer"]
+process_mode = 3
+custom_minimum_size = Vector2(220, 45)
+layout_mode = 2
+text = "Main Menu"
+
+[node name="QuitButton" type="Button" parent="CanvasLayer/PauseMenu/VBoxContainer"]
 process_mode = 3
 custom_minimum_size = Vector2(220, 45)
 layout_mode = 2
 text = "Quit"
 
-[node name="SettingsPage" type="Panel" parent="CanvasLayer/PauseMenu"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/PauseMenu/SettingsPage"]
-process_mode = 3
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = 250.0
-offset_bottom = 250.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/separation = 12
-
-[node name="BorderlessButton" type="Button" parent="CanvasLayer/PauseMenu/SettingsPage/VBoxContainer"]
-custom_minimum_size = Vector2(220, 45)
+[node name="BordlessButton" type="Button" parent="CanvasLayer/PauseMenu/VBoxContainer"]
 layout_mode = 2
-text = "Borderless"
 
-[node name="FullscreenButton" type="Button" parent="CanvasLayer/PauseMenu/SettingsPage/VBoxContainer"]
-custom_minimum_size = Vector2(220, 45)
+[node name="FullscreenButton" type="Button" parent="CanvasLayer/PauseMenu/VBoxContainer"]
 layout_mode = 2
-text = "Fullscreen
-"
 
-[node name="BackButton" type="Button" parent="CanvasLayer/PauseMenu/SettingsPage/VBoxContainer"]
-custom_minimum_size = Vector2(220, 45)
+[node name="SensitivitySlider" type="HSlider" parent="CanvasLayer/PauseMenu/VBoxContainer"]
 layout_mode = 2
-text = "Back
-"
 
 [node name="water_drip_cave" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("22_ctatt")
