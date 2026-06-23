@@ -211,10 +211,6 @@ func setup_ui():
 	
 	level_label.position = Vector2(20, 40)
 	exp_label.position = Vector2(20, 55)
-
-	playtime_label.position = Vector2(570, 15)
-	playtime_label.size = Vector2(160, 30)
-	playtime_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	
 	achievement_popup.visible = false
 	achievement_popup.modulate.a = 0.0
@@ -231,24 +227,27 @@ func setup_ui():
 	statistics_label.text = ""
 	achievements_label.text = ""
 	stats_back_button.text = "Back"
-	
+
 	score_label.visible = true
 	score_label.text = "Score: " + str(score)
-	score_label.position = Vector2(1075, 15)
-	score_label.size = Vector2(180, 30)
+	score_label.size = Vector2(220, 30)
 	score_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	score_label.z_index = 100
-	
+
 	gold_icon.visible = true
-	gold_label.visible = true
-	gold_icon.position = Vector2(1180, 50)
 	gold_icon.scale = Vector2(0.75, 0.75)
-	gold_label.position = Vector2(1200, 40)
-	gold_label.size = Vector2(120, 30)
-	gold_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	gold_label.text = str(gold)
-	gold_label.z_index = 100
 	gold_icon.z_index = 100
+
+	gold_label.visible = true
+	gold_label.text = str(gold)
+	gold_label.size = Vector2(80, 30)
+	gold_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	gold_label.z_index = 100
+
+	playtime_label.size = Vector2(160, 30)
+	playtime_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+	update_hud_positions()
 	
 	shop_menu.visible = false
 	shop_menu.process_mode = Node.PROCESS_MODE_ALWAYS
@@ -629,13 +628,32 @@ func _on_fullscreen_button_pressed():
 
 	if mode == DisplayServer.WINDOW_MODE_FULLSCREEN:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+		fullscreen_button.text = "Fullscreen"
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+		fullscreen_button.text = "Windowed"
 
+	await get_tree().create_timer(0.1).timeout
+	update_hud_positions()
 
 func _on_borderless_button_pressed():
 	var borderless = DisplayServer.window_get_flag(DisplayServer.WINDOW_FLAG_BORDERLESS)
 	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, !borderless)
+
+
+func update_hud_positions():
+	var screen_size = get_viewport().get_visible_rect().size
+
+	score_label.position = Vector2(screen_size.x - 240, 15)
+
+	gold_icon.position = Vector2(screen_size.x - 70, 50)
+	gold_label.position = Vector2(screen_size.x - 40, 40)
+
+	playtime_label.position = Vector2((screen_size.x / 2) - 80, 15)
+
+func _notification(what):
+	if what == NOTIFICATION_WM_SIZE_CHANGED:
+		update_hud_positions()
 
 
 func _on_main_menu_button_pressed():

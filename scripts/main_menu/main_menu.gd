@@ -30,18 +30,20 @@ func _ready():
 	setup_ui()
 	connect_buttons()
 	create_rain()
+	update_menu_layout()
 	start_lightning_loop()
 
 
 func setup_ui():
 	background.color = Color(0.02, 0.02, 0.04, 1)
+	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	lightning_flash.color = Color(1, 1, 1, 1)
 	lightning_flash.modulate.a = 0.0
 	lightning_flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-	menu_panel.position = Vector2(80, 210)
 	menu_panel.size = Vector2(360, 320)
+	settings_panel.size = Vector2(360, 260)
 
 	title_label.text = "DUNGEON\nOF THE FALLEN"
 	continue_button.text = "Continue"
@@ -49,21 +51,37 @@ func setup_ui():
 	settings_button.text = "Settings"
 	quit_button.text = "Quit"
 
-	knight_preview.position = Vector2(980, 460)
-	knight_preview.scale = Vector2(12, 12)
-	knight_preview.z_index = 5
-	knight_preview.play("idle_south")
-
-	settings_panel.visible = false
-	settings_panel.position = Vector2(80, 210)
-	settings_panel.size = Vector2(360, 260)
-
 	fullscreen_button.text = "Fullscreen"
 	borderless_button.text = "Borderless"
 	back_button.text = "Back"
 
+	knight_preview.scale = Vector2(15, 15)
+	knight_preview.z_index = 5
+	knight_preview.play("idle_south")
+
+	settings_panel.visible = false
+
 	if not FileAccess.file_exists(save_path):
 		continue_button.disabled = true
+
+
+func update_menu_layout():
+	var screen_size = get_viewport_rect().size
+
+	background.position = Vector2.ZERO
+	background.size = screen_size
+
+	lightning_flash.position = Vector2.ZERO
+	lightning_flash.size = screen_size
+
+	rain_layer.position = Vector2.ZERO
+
+	menu_panel.position = Vector2(80, (screen_size.y / 2) - 160)
+	settings_panel.position = Vector2(80, (screen_size.y / 2) - 130)
+
+	knight_preview.position = Vector2(screen_size.x * 0.75, screen_size.y * 0.55)
+
+
 func connect_buttons():
 	continue_button.pressed.connect(_on_continue_pressed)
 	new_game_button.pressed.connect(_on_new_game_pressed)
@@ -103,13 +121,26 @@ func _on_fullscreen_pressed():
 
 	if mode == DisplayServer.WINDOW_MODE_FULLSCREEN:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+		fullscreen_button.text = "Fullscreen"
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+		fullscreen_button.text = "Windowed"
+
+	await get_tree().create_timer(0.1).timeout
+	update_menu_layout()
 
 
 func _on_borderless_pressed():
 	var borderless = DisplayServer.window_get_flag(DisplayServer.WINDOW_FLAG_BORDERLESS)
 	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, not borderless)
+
+	await get_tree().create_timer(0.1).timeout
+	update_menu_layout()
+
+
+func _notification(what):
+	if what == NOTIFICATION_WM_SIZE_CHANGED:
+		update_menu_layout()
 
 
 func delete_save_file():
@@ -139,9 +170,11 @@ func flash_lightning_sequence():
 
 		await tween.finished
 		await get_tree().create_timer(randf_range(0.05, 0.22)).timeout
-		
+
 
 func create_rain():
+	var screen_size = get_viewport_rect().size
+
 	for i in range(rain_amount):
 		var drop = Line2D.new()
 		drop.width = 1.0
@@ -154,25 +187,25 @@ func create_rain():
 		]
 
 		drop.position = Vector2(
-			randf_range(0, 1280),
-			randf_range(-720, 720)
+			randf_range(0, screen_size.x),
+			randf_range(-screen_size.y, screen_size.y)
 		)
 
 		rain_layer.add_child(drop)
 		rain_drops.append(drop)
-		
-		
+
+
 func _process(delta):
 	update_rain(delta)
 
 
 func update_rain(delta):
+	var screen_size = get_viewport_rect().size
+
 	for drop in rain_drops:
 		drop.position.y += rain_speed * delta
 		drop.position.x -= 120 * delta
 
-		if drop.position.y > 760:
+		if drop.position.y > screen_size.y + 40:
 			drop.position.y = randf_range(-120, -20)
-			drop.position.x = randf_range(0, 1280)
-			
-		
+			drop.position.x = randf_range(0, screen_size.x + 200)
