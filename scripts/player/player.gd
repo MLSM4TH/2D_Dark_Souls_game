@@ -1,5 +1,19 @@
 extends CharacterBody2D
 
+@export var critical_chance = 0.15
+@export var critical_multiplier = 2.0
+
+@onready var anim = $AnimatedSprite2D
+@onready var stamina_bar = $"../CanvasLayer/StaminaBar"
+@onready var health_bar = $"../CanvasLayer/HealthBar"
+
+@onready var footstep_sound = $footstep_rock
+@onready var slash_sound = $sword_slash
+@onready var dodge_sound = $dodge
+@onready var parry_sound = $"sword_parry"
+
+@onready var camera = $Camera2D
+
 var walk_speed = 200
 var run_speed = 400
 
@@ -33,15 +47,6 @@ var can_cancel_attack = false
 var player_attack_damage = 10.0
 var player_attack_range = 25.0
 
-@onready var anim = $AnimatedSprite2D
-@onready var stamina_bar = $"../CanvasLayer/StaminaBar"
-@onready var health_bar = $"../CanvasLayer/HealthBar"
-
-@onready var footstep_sound = $footstep_rock
-@onready var slash_sound = $sword_slash
-@onready var dodge_sound = $dodge
-@onready var parry_sound = $"sword_parry"
-
 
 func _ready():
 	add_to_group("player")
@@ -54,16 +59,22 @@ func _ready():
 	health_bar.play("health_bar_depletion_animation")
 	health_bar.pause()
 
+	health = max_health
+	health_bar.frame = 0
+	update_health_bar()
+
 	footstep_sound.volume_db = -12
 	slash_sound.volume_db = -6
 	dodge_sound.volume_db = -8
 	parry_sound.volume_db = -8
 
 	update_stamina_bar()
-	update_health_bar()
 
 
 func _physics_process(delta):
+	if not is_inside_tree():
+		return
+
 	var direction = Vector2.ZERO
 
 	if Input.is_action_pressed("move_right"):
@@ -135,6 +146,21 @@ func _physics_process(delta):
 	handle_footsteps(direction, is_sprinting)
 
 
+func cancel_all_actions():
+	is_attacking = false
+	is_dodging = false
+	is_invincible = false
+	is_parrying = false
+	can_cancel_attack = false
+	attack_damage_active = false
+	velocity = Vector2.ZERO
+	stop_footsteps()
+
+	if is_instance_valid(anim):
+		anim.speed_scale = 1.0
+		play_idle_animation()
+
+
 func take_damage(amount):
 	if is_invincible:
 		return
@@ -143,14 +169,42 @@ func take_damage(amount):
 	health = clamp(health, 0, max_health)
 	update_health_bar()
 
+	shake_camera(4)
+
+	if not is_inside_tree():
+		return
+
+	var world = get_tree().current_scene
+
+	if world != null and world.has_method("add_damage_taken"):
+		world.add_damage_taken(amount)
+
 	if health <= 0:
 		die()
 
 
 func die():
+	if not is_inside_tree():
+		return
+
 	print("Player died")
-	velocity = Vector2.ZERO
+
 	set_physics_process(false)
+	velocity = Vector2.ZERO
+	stop_footsteps()
+
+	var tween = create_tween()
+	tween.tween_property(anim, "modulate:a", 0.0, 1.0)
+
+	await tween.finished
+
+	if not is_inside_tree():
+		return
+
+	var world = get_tree().current_scene
+
+	if world != null and world.has_method("show_death_screen"):
+		world.show_death_screen()
 
 
 func update_health_bar():
@@ -182,12 +236,15 @@ func handle_footsteps(direction, is_sprinting):
 
 
 func stop_footsteps():
-	if footstep_sound.playing:
+	if is_instance_valid(footstep_sound) and footstep_sound.playing:
 		footstep_sound.stop()
 
 
 func start_dodge(direction):
 	if direction == Vector2.ZERO:
+		return
+
+	if not is_inside_tree():
 		return
 
 	stop_footsteps()
@@ -214,6 +271,9 @@ func start_dodge(direction):
 
 	await get_tree().create_timer(dodge_duration).timeout
 
+	if not is_inside_tree():
+		return
+
 	is_dodging = false
 	is_invincible = false
 	anim.speed_scale = 1.0
@@ -222,6 +282,9 @@ func start_dodge(direction):
 
 
 func attack():
+	if not is_inside_tree():
+		return
+
 	stop_footsteps()
 
 	stamina -= attack_stamina_cost
@@ -247,7 +310,13 @@ func attack():
 	anim.play(attack_animation)
 
 	while anim.frame < 2 and is_attacking:
+		if not is_inside_tree():
+			return
+
 		await get_tree().process_frame
+
+	if not is_inside_tree():
+		return
 
 	if is_attacking:
 		attack_damage_active = true
@@ -256,6 +325,9 @@ func attack():
 	can_cancel_attack = true
 
 	while anim.is_playing() and is_attacking:
+		if not is_inside_tree():
+			return
+
 		if velocity.length() > 0 and can_cancel_attack:
 			anim.stop()
 			is_attacking = false
@@ -263,6 +335,9 @@ func attack():
 			return
 
 		await get_tree().process_frame
+
+	if not is_inside_tree():
+		return
 
 	is_attacking = false
 	can_cancel_attack = false
@@ -346,6 +421,9 @@ func handle_animation(direction, is_sprinting):
 
 
 func play_idle_animation():
+	if not is_instance_valid(anim):
+		return
+
 	anim.speed_scale = 1.0
 
 	if last_direction == "sideways":
@@ -354,37 +432,86 @@ func play_idle_animation():
 		anim.play("idle_south")
 	elif last_direction == "north":
 		anim.play("idle_north")
-		
+
+
 func damage_enemy_in_range():
+	if not is_inside_tree():
+		return
+
 	var enemies = get_tree().get_nodes_in_group("enemy")
 
 	for enemy in enemies:
+		if enemy == null or not is_instance_valid(enemy):
+			continue
+
 		var to_enemy = enemy.global_position - global_position
 
-		# SOUTH ATTACK
 		if last_direction == "south":
 			if to_enemy.y > -20 and to_enemy.y < 90 and abs(to_enemy.x) < 55:
 				hit_enemy(enemy)
 
-		# NORTH ATTACK
 		elif last_direction == "north":
 			if to_enemy.y < 35 and to_enemy.y > -130 and abs(to_enemy.x) < 70:
 				hit_enemy(enemy)
 
-		# SIDEWAYS ATTACK
 		elif last_direction == "sideways":
-
-			# RIGHT
 			if anim.flip_h == false:
 				if to_enemy.x > -10 and to_enemy.x < 110 and abs(to_enemy.y) < 50:
 					hit_enemy(enemy)
-
-			# LEFT
 			else:
 				if to_enemy.x < 10 and to_enemy.x > -110 and abs(to_enemy.y) < 50:
 					hit_enemy(enemy)
-					
+
+
 func hit_enemy(enemy):
+	if enemy == null or not is_instance_valid(enemy):
+		return
+
 	if enemy.has_method("take_damage"):
-		print("Enemy hit")
-		enemy.take_damage(player_attack_damage)
+		var final_damage = player_attack_damage
+		var is_critical = false
+
+		shake_camera(2)
+
+		if randf() <= critical_chance:
+			final_damage *= critical_multiplier
+			is_critical = true
+
+		if is_inside_tree():
+			var world = get_tree().current_scene
+
+			if world != null and world.has_method("add_damage_dealt"):
+				world.add_damage_dealt(final_damage)
+
+			if is_critical and world != null and world.has_method("add_critical_hit"):
+				world.add_critical_hit()
+
+		print("Enemy hit: ", final_damage)
+
+		if enemy.has_method("show_damage_number"):
+			enemy.show_damage_number(str(int(final_damage)), is_critical)
+
+		enemy.take_damage(final_damage)
+
+
+func shake_camera(strength):
+	if not is_inside_tree():
+		return
+
+	if not is_instance_valid(camera):
+		return
+
+	var original_offset = camera.offset
+
+	camera.offset = Vector2(
+		randf_range(-strength, strength),
+		randf_range(-strength, strength)
+	)
+
+	await get_tree().create_timer(0.05).timeout
+
+	if not is_inside_tree():
+		return
+
+	if is_instance_valid(camera):
+		camera.offset = original_offset

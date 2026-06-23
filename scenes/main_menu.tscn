@@ -1,0 +1,132 @@
+[gd_scene load_steps=8 format=3 uid="uid://cg0eqfimjf7dc"]
+
+[ext_resource type="Script" uid="uid://si4yslbn2887" path="res://scripts/main_menu/main_menu.gd" id="1_ekxnf"]
+[ext_resource type="Texture2D" uid="uid://cgyebo7g7unyo" path="res://assets/player/idle/idle_south.png" id="1_l6cm7"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ekxnf"]
+atlas = ExtResource("1_l6cm7")
+region = Rect2(0, 0, 80, 80)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bqqt6"]
+atlas = ExtResource("1_l6cm7")
+region = Rect2(80, 0, 80, 80)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wu84c"]
+atlas = ExtResource("1_l6cm7")
+region = Rect2(160, 0, 80, 80)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8ln24"]
+atlas = ExtResource("1_l6cm7")
+region = Rect2(240, 0, 80, 80)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_rtw2f"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ekxnf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bqqt6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wu84c")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8ln24")
+}],
+"loop": true,
+"name": &"idle_south",
+"speed": 5.0
+}]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ekxnf")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.32950324, 0.0036366633, 0.15387246, 1)
+
+[node name="LightningFlash" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="RainLayer" type="Node2D" parent="."]
+
+[node name="KnightPreview" type="AnimatedSprite2D" parent="."]
+position = Vector2(900, 360)
+scale = Vector2(50, 50)
+sprite_frames = SubResource("SpriteFrames_rtw2f")
+animation = &"idle_south"
+
+[node name="MenuPanel" type="Panel" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MenuPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="MenuPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ContinueButton" type="Button" parent="MenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(300, 42)
+layout_mode = 2
+
+[node name="NewGameButton" type="Button" parent="MenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(300, 42)
+layout_mode = 2
+
+[node name="SettingsButton" type="Button" parent="MenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(300, 42)
+layout_mode = 2
+
+[node name="QuitButton" type="Button" parent="MenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(300, 42)
+layout_mode = 2
+
+[node name="SettingsPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SettingsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SettingsTitleLabel" type="Label" parent="SettingsPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="FullscreenButton" type="Button" parent="SettingsPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="BorderlessButton" type="Button" parent="SettingsPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="SettingsPanel/VBoxContainer"]
+layout_mode = 2

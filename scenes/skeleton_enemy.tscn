@@ -429,6 +429,7 @@ animations = [{
 [node name="SkeletonEnemy" type="CharacterBody2D"]
 process_mode = 1
 y_sort_enabled = true
+scale = Vector2(2, 2)
 collision_layer = 4
 collision_mask = 3
 motion_mode = 1
@@ -441,7 +442,6 @@ animation = &"skeleton_walking_north"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 8)
 shape = SubResource("RectangleShape2D_0t2vl")
-disabled = true
 
 [node name="EnemyHealthBar" type="AnimatedSprite2D" parent="."]
 visible = false

@@ -1,7 +1,6 @@
-[gd_scene load_steps=93 format=3 uid="uid://cdgpybdh8cgyv"]
+[gd_scene load_steps=92 format=3 uid="uid://cdgpybdh8cgyv"]
 
 [ext_resource type="Script" uid="uid://cgvrw0mvb7rb0" path="res://scripts/world/world.gd" id="1_o8fc1"]
-[ext_resource type="Texture2D" uid="uid://bjurll1orw0ml" path="res://assets/loot/coin_front.png" id="7_7r4gi"]
 [ext_resource type="PackedScene" uid="uid://jrhmc20s0nsj" path="res://scenes/player.tscn" id="8_4mrxx"]
 [ext_resource type="Texture2D" uid="uid://n1jfyx4whsxb" path="res://assets/world generation/walls tiles/brick_wall.png" id="15_7t5mc"]
 [ext_resource type="Texture2D" uid="uid://dgpwsrwj1fewa" path="res://assets/world generation/walls tiles/brick_wall_decayed.png" id="16_lakw3"]
@@ -692,15 +691,6 @@ grow_horizontal = 0
 text = "Score: 0"
 horizontal_alignment = 2
 
-[node name="GoldLabel" type="Label" parent="CanvasLayer/GameplayHUD"]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
-text = "0"
-
-[node name="GoldIcon" type="Sprite2D" parent="CanvasLayer/GameplayHUD"]
-texture = ExtResource("7_7r4gi")
-
 [node name="PauseMenu" type="Panel" parent="CanvasLayer"]
 process_mode = 3
 visible = false
@@ -748,18 +738,23 @@ layout_mode = 2
 text = "Statistics
 "
 
-[node name="StatisticsBox" type="VBoxContainer" parent="CanvasLayer/PauseMenu/MainPausePage/VBoxContainer"]
-layout_mode = 2
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/PauseMenu/MainPausePage/VBoxContainer/StatisticsButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="StatisticsLabel" type="Label" parent="CanvasLayer/PauseMenu/MainPausePage/VBoxContainer/StatisticsBox"]
+[node name="StatisticsLabel" type="Label" parent="CanvasLayer/PauseMenu/MainPausePage/VBoxContainer/StatisticsButton/VBoxContainer"]
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="AchievementsLabel" type="Label" parent="CanvasLayer/PauseMenu/MainPausePage/VBoxContainer/StatisticsBox"]
+[node name="AchievementsLabel" type="Label" parent="CanvasLayer/PauseMenu/MainPausePage/VBoxContainer/StatisticsButton/VBoxContainer"]
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="StatsBackButton" type="Button" parent="CanvasLayer/PauseMenu/MainPausePage/VBoxContainer/StatisticsBox"]
+[node name="StatsBackButton" type="Button" parent="CanvasLayer/PauseMenu/MainPausePage/VBoxContainer/StatisticsButton/VBoxContainer"]
 layout_mode = 2
 text = "Stats Back
 "
@@ -850,42 +845,6 @@ uppercase = true
 [node name="LevelUpLabel" type="Label" parent="CanvasLayer"]
 offset_right = 40.0
 offset_bottom = 23.0
-
-[node name="ShopMenu" type="Panel" parent="CanvasLayer"]
-visible = false
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/ShopMenu"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="TitleLabel" type="Label" parent="CanvasLayer/ShopMenu/VBoxContainer"]
-layout_mode = 2
-
-[node name="HealthUpgradeButton" type="Button" parent="CanvasLayer/ShopMenu/VBoxContainer"]
-layout_mode = 2
-text = "+10 Health - 50 Gold"
-
-[node name="DamageUpgradeButton" type="Button" parent="CanvasLayer/ShopMenu/VBoxContainer"]
-layout_mode = 2
-text = "+2 Damage - 75 Gold"
-
-[node name="StaminaUpgradeButton" type="Button" parent="CanvasLayer/ShopMenu/VBoxContainer"]
-layout_mode = 2
-text = "+10 Stamina - 50 Gold"
-
-[node name="PotionButton" type="Button" parent="CanvasLayer/ShopMenu/VBoxContainer"]
-layout_mode = 2
-text = "Full Heal - 30 Gold"
-
-[node name="BackButton" type="Button" parent="CanvasLayer/ShopMenu/VBoxContainer"]
-layout_mode = 2
-text = "Close"
 
 [node name="water_drip_cave" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("22_ctatt")

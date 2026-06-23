@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://b16t5tyditiw7"]
+
+[ext_resource type="Script" uid="uid://cy61rgrfa00lx" path="res://scripts/goblin_shop/goblin_shop.gd" id="1_ufyea"]
+[ext_resource type="Texture2D" uid="uid://bj8kiftrd18y3" path="res://assets/store/gobling.png" id="2_k105i"]
+
+[node name="goblin_shop" type="Area2D"]
+script = ExtResource("1_ufyea")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_k105i")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+
+[node name="InteractionLabel" type="Label" parent="."]
+offset_right = 40.0
+offset_bottom = 23.0
